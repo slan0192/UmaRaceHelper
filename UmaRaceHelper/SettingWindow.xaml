@@ -1,0 +1,16 @@
+﻿<Window x:Class="UmaRaceHelper.SettingWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UmaRaceHelper"
+        mc:Ignorable="d"
+        Title="SettingWindow" Height="91.816" Width="732.399">
+    <Grid>
+        <TextBox x:Name="tbUmamusuAppPath" HorizontalAlignment="Left" Height="29" Margin="128,14,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="478" FontSize="16"/>
+        <Label x:Name="label" Content="ウマ娘の場所" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="41" Width="126" FontSize="20"/>
+        <Button x:Name="btBrows" Content="参照" HorizontalAlignment="Left" Height="29" Margin="611,14,0,0" VerticalAlignment="Top" Width="54" FontSize="16" Click="btBrows_Click"/>
+        <Button x:Name="btOK" Content="OK" HorizontalAlignment="Left" Height="29" Margin="670,14,0,0" VerticalAlignment="Top" Width="40" Click="btOK_Click" FontSize="16"/>
+
+    </Grid>
+</Window>
