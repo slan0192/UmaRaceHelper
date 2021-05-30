@@ -127,41 +127,67 @@ namespace UmaRaceHelper
 
         private void readData(string filePath)
         {
-            mPacketData = new PacketData(filePath);
-            if (!mPacketData.isExistRaceData())
+            if (mPacketData != null &&
+                mPacketData.getRaceType() == PacketData.RaceType.Daily &&
+                mPacketData.getRaceScenario(0) == null)
+            {
+                mPacketData.additionalRead(filePath);
+            }
+            else
+            {
+                mPacketData = new PacketData(filePath);
+            }
+            if (mPacketData.getRaceType() == PacketData.RaceType.None)
                 return;
 
             Dispatcher.Invoke(updateUI);
+        }
+
+        private void setIkuseiRaceData2cbbItem()
+        {
+            if (mPacketData.getRaceScenario(0) == null)
+                return;
+
+            int raceId = mPacketData.getRaceData(0).getRaceId();
+            int programId = mPacketData.getRaceData(0).getProgramId();
+            if (raceId != -1)
+            {
+                cbbRace.Items.Add(SQLite.getRaceName(raceId));
+            }
+            else if (programId != -1)
+            {
+                cbbRace.Items.Add(SQLite.getRaceNameFromProgramId(programId));
+            }
+            else
+            {
+                cbbRace.Items.Add("UnKnown Race");
+            }
+        }
+
+        private void setGroupRaceData2cbbItem()
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                string raceName = SQLite.getRaceName(mPacketData.getRaceData(i).getRaceId());
+                cbbRace.Items.Add(raceName);
+            }
         }
 
         private void updateUI()
         {
             cbbRace.Items.Clear();
 
-            if (mPacketData.isGroupRace())
+            switch (mPacketData.getRaceType())
             {
-                for (int i = 0; i < 5; i++)
-                {
-                    string raceName = SQLite.getRaceName(mPacketData.getRaceData(i).getRaceId());
-                    cbbRace.Items.Add(raceName);
-                }
-            }
-            else
-            {
-                int raceId = mPacketData.getRaceData(0).getRaceId();
-                int programId = mPacketData.getRaceData(0).getProgramId();
-                if (raceId != -1)
-                {
-                    cbbRace.Items.Add(SQLite.getRaceName(raceId));
-                }
-                else if (programId != -1)
-                {
-                    cbbRace.Items.Add(SQLite.getRaceNameFromProgramId(programId));
-                }
-                else
-                {
-                    cbbRace.Items.Add("UnKnown Race");
-                }
+                case PacketData.RaceType.Ikusei:
+                case PacketData.RaceType.Room:
+                case PacketData.RaceType.Daily:
+                case PacketData.RaceType.Legend:
+                    setIkuseiRaceData2cbbItem();
+                    break;
+                case PacketData.RaceType.Group:
+                    setGroupRaceData2cbbItem();
+                    break;
             }
             cbbRace.SelectedIndex = 0;
         }
