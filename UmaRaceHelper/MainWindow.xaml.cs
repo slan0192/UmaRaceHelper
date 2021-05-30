@@ -78,7 +78,20 @@ namespace UmaRaceHelper
         private void cbbUma_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (cbbUma.SelectedIndex >= 0)
+            {
+                HorseData horse = mPacketData.getRaceData(cbbRace.SelectedIndex).getHorse(cbbUma.SelectedIndex);
+                tbUmaInfo.Text = "スピード：" + horse.mStatus.speed.ToString() + Environment.NewLine +
+                    "スタミナ：" + horse.mStatus.stamina.ToString() + Environment.NewLine +
+                    "パワー：" + horse.mStatus.pow.ToString() + Environment.NewLine +
+                    "根性：" + horse.mStatus.guts.ToString() + Environment.NewLine +
+                    "賢さ：" + horse.mStatus.wiz.ToString();
+                tbUmaInfoSkill.Text = "";
+                for (int i = 0; i < horse.mSkill.Length; i++)
+                {
+                    tbUmaInfoSkill.Text += SQLite.getSkillName(horse.mSkill[i]) + Environment.NewLine;
+                }
                 drawGraph();
+            }
         }
 
         private void checkBox_Click(object sender, RoutedEventArgs e)

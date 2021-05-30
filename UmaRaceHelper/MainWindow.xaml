@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UmaRaceHelper"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="720.292" Initialized="Window_Initialized"
+        Title="MainWindow" Height="450" Width="1031.887" Initialized="Window_Initialized"
         AllowDrop="True" PreviewDragOver="Window_PreviewDragOver" Drop="Window_Drop">
     <Grid Margin="0,0,-4.5,0.5">
         <ComboBox x:Name="cbbUma" HorizontalAlignment="Left" Height="36" Margin="77,51,0,0" VerticalAlignment="Top" Width="341" FontSize="16" SelectionChanged="cbbUma_SelectionChanged"/>
@@ -45,7 +45,7 @@
         <Canvas HorizontalAlignment="Left" Height="313" Margin="10,101,0,0" VerticalAlignment="Top" Width="692">
             <local:View x:Name="view" Height="313" Width="690" />
         </Canvas>
-        <Button x:Name="btSetting" Content="設定" HorizontalAlignment="Left" Height="56" Margin="616,12,0,0" VerticalAlignment="Top" Width="86" FontSize="16" Click="btSetting_Click"/>
+        <Button x:Name="btSetting" Content="設定" HorizontalAlignment="Left" Height="56" Margin="600,12,0,0" VerticalAlignment="Top" Width="86" FontSize="16" Click="btSetting_Click"/>
         <CheckBox x:Name="cbDebuffSkill" Content="デバフスキル(受)" HorizontalAlignment="Left" Margin="443,20,0,0" RenderTransformOrigin="1,1" Click="checkBox_Click" VerticalAlignment="Top" IsChecked="True">
             <CheckBox.RenderTransform>
                 <TransformGroup>
@@ -56,5 +56,15 @@
                 </TransformGroup>
             </CheckBox.RenderTransform>
         </CheckBox>
+        <Border BorderThickness="2" CornerRadius="10" BorderBrush="Black" Margin="709,36,44.5,241">
+            <TextBlock x:Name="tbUmaInfo" Height="114" Margin="8,18,8,-2" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="16"/>
+        </Border>
+        <Border BorderThickness="2" CornerRadius="10" BorderBrush="Black" Margin="709,198,44.5,16">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="8,16,8,8">
+                <TextBlock x:Name="tbUmaInfoSkill" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Top" FontSize="16"/>
+            </ScrollViewer>
+        </Border>
+        <Label x:Name="label1" Content="ウマ娘のステータス" HorizontalAlignment="Left" Height="36" Margin="721,20,0,0" VerticalAlignment="Top" Width="126" FontSize="16" Background="White"/>
+        <Label x:Name="label2" Content="スキル" HorizontalAlignment="Left" Height="36" Margin="721,182,0,0" VerticalAlignment="Top" Width="52" FontSize="16" Background="White"/>
     </Grid>
 </Window>

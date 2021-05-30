@@ -137,6 +137,7 @@ namespace UmaRaceHelper
         public int mRunningStyle;
         public Proper mProper;
         public int mMotivation;
+        public int[] mSkill;
 
         public HorseData(Dictionary<object, object> dic)
         {
@@ -161,6 +162,14 @@ namespace UmaRaceHelper
                                  Convert.ToInt32(dic["proper_ground_turf"]),
                                  Convert.ToInt32(dic["proper_ground_dirt"]));
             mMotivation = Convert.ToInt32(dic["motivation"]);
+
+            object[] skills = (object[])dic["skill_array"];
+            mSkill = new int[skills.Length];
+            for (int i = 0; i < skills.Length; i++)
+            {
+                Dictionary<object, object> skillData = (Dictionary<object, object>)skills[i];
+                mSkill[i] = Convert.ToInt32(skillData["skill_id"]);
+            }
         }
     }
 }
