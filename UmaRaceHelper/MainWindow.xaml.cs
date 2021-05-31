@@ -148,10 +148,12 @@ namespace UmaRaceHelper
             }
             else
             {
-                mPacketData = new PacketData(filePath);
+                PacketData data = new PacketData(filePath);
+                if (data.getRaceType() == PacketData.RaceType.None)
+                    return;
+
+                mPacketData = data;
             }
-            if (mPacketData.getRaceType() == PacketData.RaceType.None)
-                return;
 
             Dispatcher.Invoke(updateUI);
         }
