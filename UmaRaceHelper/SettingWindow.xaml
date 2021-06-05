@@ -5,12 +5,33 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UmaRaceHelper"
         mc:Ignorable="d"
-        Title="SettingWindow" Height="91.816" Width="732.399">
+        Title="設定" Height="170.189" Width="732.399">
     <Grid>
         <TextBox x:Name="tbUmamusuAppPath" HorizontalAlignment="Left" Height="29" Margin="128,14,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="478" FontSize="16"/>
         <Label x:Name="label" Content="ウマ娘の場所" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="41" Width="126" FontSize="20"/>
         <Button x:Name="btBrows" Content="参照" HorizontalAlignment="Left" Height="29" Margin="611,14,0,0" VerticalAlignment="Top" Width="54" FontSize="16" Click="btBrows_Click"/>
         <Button x:Name="btOK" Content="OK" HorizontalAlignment="Left" Height="29" Margin="670,14,0,0" VerticalAlignment="Top" Width="40" Click="btOK_Click" FontSize="16"/>
+        <Label x:Name="label1" Content="オプション" HorizontalAlignment="Left" Height="28" Margin="35,56,0,0" VerticalAlignment="Top" Width="70" FontSize="16"/>
+        <CheckBox x:Name="cbRemoveFile" Content="Packet Data ファイルを削除する" HorizontalAlignment="Left" Height="16" Margin="113,87,0,0" VerticalAlignment="Top" Width="173" BorderThickness="1" RenderTransformOrigin="0.5,0.5" Click="cbRemoveFile_Click">
+            <CheckBox.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform ScaleX="1.4" ScaleY="1.4"/>
+                    <SkewTransform/>
+                    <RotateTransform/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </CheckBox.RenderTransform>
+        </CheckBox>
+        <CheckBox x:Name="cbNotRemoveRaceDataFile" Content="Race Data は削除しない" HorizontalAlignment="Left" Height="16" Margin="143,109,0,0" VerticalAlignment="Top" Width="173" BorderThickness="1" RenderTransformOrigin="0.5,0.5" Foreground="Black">
+            <CheckBox.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform ScaleX="1.4" ScaleY="1.4"/>
+                    <SkewTransform/>
+                    <RotateTransform/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </CheckBox.RenderTransform>
+        </CheckBox>
 
     </Grid>
 </Window>

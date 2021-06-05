@@ -24,6 +24,23 @@ namespace UmaRaceHelper
             tbUmamusuAppPath.Text = str;
         }
 
+        public bool getRemoveFileOption()
+        {
+            return (cbRemoveFile.IsChecked == true);
+        }
+
+        public bool getNotRemoveRaceFileOption()
+        {
+            return (cbNotRemoveRaceDataFile.IsChecked == true);
+        }
+
+        public void setRemoveFileOption(bool removeFile, bool notRemoveRaceDataFile)
+        {
+            cbRemoveFile.IsChecked = removeFile;
+            cbNotRemoveRaceDataFile.IsChecked = notRemoveRaceDataFile;
+            changeCbNotRemoveRaceDataFileVisibility();
+        }
+
         private void btBrows_Click(object sender, RoutedEventArgs e)
         {
             var dlg = new CommonOpenFileDialog();
@@ -40,6 +57,23 @@ namespace UmaRaceHelper
         private void btOK_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
+        }
+
+        private void cbRemoveFile_Click(object sender, RoutedEventArgs e)
+        {
+            changeCbNotRemoveRaceDataFileVisibility();
+        }
+
+        private void changeCbNotRemoveRaceDataFileVisibility()
+        {
+            if (cbRemoveFile.IsChecked == true)
+            {
+                cbNotRemoveRaceDataFile.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                cbNotRemoveRaceDataFile.Visibility = Visibility.Hidden;
+            }
         }
     }
 }

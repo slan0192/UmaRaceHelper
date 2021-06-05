@@ -12,7 +12,11 @@ namespace UmaRaceHelper
     public partial class MainWindow : Window
     {
         private SettingWindow mSettingWindow;
+        private UmaInfoWindow mUmaInfoWindow;
         private string mUmamusuAppPath = "";
+        private bool mRemoveFile = false;
+        private bool mNotRemoveRaceDataFile = false;
+
         private FileSystemWatcher mWatcher;
         private PacketData mPacketData;
         private string[] mHorseNameList; //index is frameOrder
@@ -32,14 +36,29 @@ namespace UmaRaceHelper
                 mSettingWindow.setUmamusuAppPAth(mUmamusuAppPath);
                 mSettingWindow.ShowDialog();
                 mUmamusuAppPath = mSettingWindow.getUmamusuAppPath();
+                mRemoveFile = mSettingWindow.getRemoveFileOption();
+                mNotRemoveRaceDataFile = mSettingWindow.getNotRemoveRaceFileOption();
                 settings = new Dictionary<string, string>();
                 settings.Add("uma_exe_path", mUmamusuAppPath);
+                settings.Add("remove_file", mRemoveFile.ToString());
+                settings.Add("not_remove_race_data_file", mNotRemoveRaceDataFile.ToString());
                 writeSettingToIni(settings);
                 path = mUmamusuAppPath + "\\CarrotJuicer";
             }
             else
             {
                 mUmamusuAppPath = settings["uma_exe_path"].Replace(Environment.NewLine, "");
+                if (settings.ContainsKey("remove_file"))
+                {
+                    mRemoveFile = Convert.ToBoolean(settings["remove_file"].Replace(Environment.NewLine, ""));
+                    mNotRemoveRaceDataFile = Convert.ToBoolean(settings["not_remove_race_data_file"].Replace(Environment.NewLine, ""));
+                }
+                else
+                {
+                    settings.Add("remove_file", mRemoveFile.ToString());
+                    settings.Add("not_remove_race_data_file", mNotRemoveRaceDataFile.ToString());
+                    writeSettingToIni(settings);
+                }
                 path = mUmamusuAppPath + "\\CarrotJuicer";
             }
 
@@ -80,16 +99,8 @@ namespace UmaRaceHelper
             if (cbbUma.SelectedIndex >= 0)
             {
                 HorseData horse = mPacketData.getRaceData(cbbRace.SelectedIndex).getHorse(cbbUma.SelectedIndex);
-                tbUmaInfo.Text = "スピード：" + horse.mStatus.speed.ToString() + Environment.NewLine +
-                    "スタミナ：" + horse.mStatus.stamina.ToString() + Environment.NewLine +
-                    "パワー：" + horse.mStatus.pow.ToString() + Environment.NewLine +
-                    "根性：" + horse.mStatus.guts.ToString() + Environment.NewLine +
-                    "賢さ：" + horse.mStatus.wiz.ToString();
-                tbUmaInfoSkill.Text = "";
-                for (int i = 0; i < horse.mSkill.Length; i++)
-                {
-                    tbUmaInfoSkill.Text += SQLite.getSkillName(horse.mSkill[i]) + Environment.NewLine;
-                }
+                if (menuViewUmaInfo.IsChecked == true)
+                    mUmaInfoWindow.setUmaInfo(horse);
                 drawGraph();
             }
         }
@@ -121,21 +132,34 @@ namespace UmaRaceHelper
             }
         }
 
-        private void btSetting_Click(object sender, RoutedEventArgs e)
+        private void setting_Click(object sender, RoutedEventArgs e)
         {
-            string newPath;
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+
             mSettingWindow = new SettingWindow();
             mSettingWindow.setUmamusuAppPAth(mUmamusuAppPath);
+            mSettingWindow.setRemoveFileOption(mRemoveFile, mNotRemoveRaceDataFile);
             mSettingWindow.ShowDialog();
 
-            newPath = mSettingWindow.getUmamusuAppPath();
-            if (!newPath.Equals(mUmamusuAppPath))
-            {
-                mUmamusuAppPath = newPath;
-                Dictionary<string, string> dic = new Dictionary<string, string>();
-                dic.Add("uma_exe_path", mUmamusuAppPath);
-                writeSettingToIni(dic);
-            }
+            mRemoveFile = mSettingWindow.getRemoveFileOption();
+            mNotRemoveRaceDataFile = mSettingWindow.getNotRemoveRaceFileOption();
+            mUmamusuAppPath = mSettingWindow.getUmamusuAppPath();
+
+            dic.Add("uma_exe_path", mUmamusuAppPath);
+            dic.Add("remove_file", mRemoveFile.ToString());
+            dic.Add("not_remove_race_data_file", mNotRemoveRaceDataFile.ToString());
+            writeSettingToIni(dic);
+        }
+
+        private void deletaFile(string filePath, bool isRaceData)
+        {
+            if (!mRemoveFile)
+                return;
+
+            if (isRaceData && mNotRemoveRaceDataFile)
+                return;
+
+            File.Delete(filePath);
         }
 
         private void readData(string filePath)
@@ -150,10 +174,15 @@ namespace UmaRaceHelper
             {
                 PacketData data = new PacketData(filePath);
                 if (data.getRaceType() == PacketData.RaceType.None)
+                {
+                    deletaFile(filePath, false);
                     return;
+                }
 
                 mPacketData = data;
             }
+
+            deletaFile(filePath, true);
 
             Dispatcher.Invoke(updateUI);
         }
@@ -167,11 +196,11 @@ namespace UmaRaceHelper
             int programId = mPacketData.getRaceData(0).getProgramId();
             if (raceId != -1)
             {
-                cbbRace.Items.Add(SQLite.getRaceName(raceId));
+                cbbRace.Items.Add(SQLite.getRaceName(raceId) + " [" + SQLite.getRaceDistance(raceId) + "m]");
             }
             else if (programId != -1)
             {
-                cbbRace.Items.Add(SQLite.getRaceNameFromProgramId(programId));
+                cbbRace.Items.Add(SQLite.getRaceNameFromProgramId(programId) + " [" + SQLite.getRaceDistanceFromProgramId(programId) + "m]");
             }
             else
             {
@@ -184,7 +213,8 @@ namespace UmaRaceHelper
             for (int i = 0; i < 5; i++)
             {
                 string raceName = SQLite.getRaceName(mPacketData.getRaceData(i).getRaceId());
-                cbbRace.Items.Add(raceName);
+                string raceDistance = SQLite.getRaceDistance(mPacketData.getRaceData(i).getRaceId());
+                cbbRace.Items.Add(raceName + " [" + raceDistance + "m]");
             }
         }
 
@@ -232,7 +262,7 @@ namespace UmaRaceHelper
                 mWatcher.Created += new FileSystemEventHandler(fileSystemWatcherCreated);
                 mWatcher.EnableRaisingEvents = true;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 MessageBox.Show(path + @"の監視に失敗しました");
             }
@@ -254,12 +284,15 @@ namespace UmaRaceHelper
             {
                 dic = new Dictionary<string, string>();
                 string str = File.ReadAllText("uma_race_helper.ini");
-                string[] sep = { "rn" };
+                string[] sep = { Environment.NewLine };
                 string[] line = str.Split(sep, StringSplitOptions.None);
                 foreach (string l in line)
                 {
-                    string[] v = l.Split('=');
-                    dic.Add(v[0], v[1]);
+                    if (l.IndexOf("=") >= 0)
+                    {
+                        string[] v = l.Split('=');
+                        dic.Add(v[0], v[1]);
+                    }
                 }
             }
             return dic;
@@ -273,6 +306,41 @@ namespace UmaRaceHelper
                 sw.WriteLine(key + "=" + dic[key]);
             }
             sw.Close();
+        }
+
+        private void umaInfo_Click(object sender, RoutedEventArgs e)
+        {
+            if (menuViewUmaInfo.IsChecked == true)
+            {
+                mUmaInfoWindow = new UmaInfoWindow();
+                if (cbbUma.SelectedIndex >= 0)
+                {
+                    HorseData horse = mPacketData.getRaceData(cbbRace.SelectedIndex).getHorse(cbbUma.SelectedIndex);
+                    mUmaInfoWindow.setUmaInfo(horse);
+                }
+                mUmaInfoWindow.Left = this.Left + this.Width - 10;
+                mUmaInfoWindow.Top = this.Top;
+                mUmaInfoWindow.Show();
+            }
+            else
+            {
+                mUmaInfoWindow.Close();
+            }
+        }
+
+        private void Window_Closing(object sender, EventArgs e)
+        {
+            if (menuViewUmaInfo.IsChecked == true)
+                mUmaInfoWindow.Close();
+        }
+
+        private void Window_LocationChanged(object sender, EventArgs e)
+        {
+            if (menuViewUmaInfo.IsChecked == true)
+            {
+                mUmaInfoWindow.Left = this.Left + this.Width - 10;
+                mUmaInfoWindow.Top = this.Top;
+            }
         }
     }
 }

@@ -2,6 +2,14 @@
 using System.Data.SQLite;
 using System.Runtime.InteropServices;
 
+/* mission data:
+ * mission_data table にある。期間限定は多分 mission_type=4
+ *   start_date, end_date がある。
+ * text_data table の category=67, index が mission_data の id
+ */
+ /* 育成のレースについて
+  * single_mode_program table の month, half に開催月（前・後）が格納されている。
+  */
 namespace UmaRaceHelper
 {
     class SQLite
@@ -10,13 +18,6 @@ namespace UmaRaceHelper
         static extern int SHGetKnownFolderPath([MarshalAs(UnmanagedType.LPStruct)] Guid rfid, uint dwFlags, IntPtr hToken, out IntPtr pszPath);
 
         private static string mDbPath = "";
-
-        /* race info:
-         * 育成モードの時 single_mode_program テーブルの race_instance_id から取得（id=program_id）
-         * race id: race_instance table の race_id から取得 (id=race_instance_id)
-         * race table の course_set から race_cource_set table の ID が取れる(id=race_id)
-         * race_course_set table の distance から距離が取れる。
-         */
 
         public static string getUmamusuName(int id)
         {
@@ -49,6 +50,34 @@ namespace UmaRaceHelper
             {
                 int raceId = Convert.ToInt32(getData(cn, cmd, "race_instance_id"));
                 return getDataFromTextDataTable(cn, 29, raceId);
+            }
+        }
+
+        public static string getRaceDistance(int id)
+        {
+            string cmd = "select * from race_instance where id=" + id.ToString();
+            using (var cn = open())
+            {
+                string raceId = getData(cn, cmd, "race_id");
+                cmd = "select * from race where id=" + raceId;
+                string courseSetId = getData(cn, cmd, "course_set");
+                cmd = "select * from race_course_set where id=" + courseSetId;
+                return getData(cn, cmd, "distance");
+            }
+        }
+
+        public static string getRaceDistanceFromProgramId(int id)
+        {
+            string cmd = "select * from single_mode_program where id=" + id.ToString();
+            using (var cn = open())
+            {
+                string raceInstanceId = getData(cn, cmd, "race_instance_id");
+                cmd = "select * from race_instance where id=" + raceInstanceId;
+                string raceId = getData(cn, cmd, "race_id");
+                cmd = "select * from race where id=" + raceId;
+                string courseSetId = getData(cn, cmd, "course_set");
+                cmd = "select * from race_course_set where id=" + courseSetId;
+                return getData(cn, cmd, "distance");
             }
         }
 

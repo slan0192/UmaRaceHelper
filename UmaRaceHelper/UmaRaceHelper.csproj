@@ -82,6 +82,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="HorseData.cs" />
     <Compile Include="PacketData.cs" />
     <Compile Include="RaceData.cs" />
     <Compile Include="RaceScenarioData.cs" />
@@ -90,6 +91,9 @@
     </Compile>
     <Compile Include="SQLite.cs" />
     <Compile Include="StructConverter.cs" />
+    <Compile Include="UmaInfoWindow.xaml.cs">
+      <DependentUpon>UmaInfoWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -106,6 +110,10 @@
     <Page Include="SettingWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UmaInfoWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>

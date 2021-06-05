@@ -6,7 +6,7 @@ using System.IO.Compression;
 
 namespace UmaRaceHelper
 {
-    class PacketData
+    public class PacketData
     {
         public enum RaceType
         {

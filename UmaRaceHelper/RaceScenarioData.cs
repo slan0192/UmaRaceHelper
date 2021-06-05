@@ -3,7 +3,7 @@
 // laneposition max 9777
 namespace UmaRaceHelper
 {
-    class RaceScenarioParser
+    public class RaceScenarioParser
     {
         public static object[] parse(byte[] bytes, string format, int size, int offset)
         {
@@ -13,7 +13,7 @@ namespace UmaRaceHelper
         }
     }
 
-    class HorseFrameData
+    public class HorseFrameData
     {
         public float distance;
         public int lanePosition;
@@ -33,7 +33,7 @@ namespace UmaRaceHelper
         }
     }
 
-    class FrameData
+    public class FrameData
     {
         private float mTime;
         private int mNumHorse;
@@ -78,7 +78,7 @@ namespace UmaRaceHelper
         }
     }
 
-    class EventData
+    public class EventData
     {
         public float frameTime;
         public int type;
@@ -102,7 +102,7 @@ namespace UmaRaceHelper
         }
     }
 
-    class HorseResultData
+    public class HorseResultData
     {
         public int finishOrder;
         public float finishTime;
@@ -130,7 +130,7 @@ namespace UmaRaceHelper
         }
     }
 
-    class RaceScenarioData
+    public class RaceScenarioData
     {
         private int mHorseNum;
         private int horseFrameSize;
