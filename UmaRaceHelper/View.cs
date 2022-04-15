@@ -203,34 +203,66 @@ namespace UmaRaceHelper
             drawingContext.Pop();
         }
 
+        public enum SkillEventType
+        {
+            Skill_Buff,
+            Skill_Debuf,
+            Event,
+        };
+
         void drawSkill(DrawingContext drawingContext,ref Rect graphRect,
             int eventCount, int frameOrder, double maxTime)
         {
             for (int i = 0; i < eventCount; i++)
             {
                 EventData eventData = mRaceScenario.getEventData(i);
-                bool isDebuff = false;
-                if (eventData.type != 3)
-                    continue;
-
-                if (eventData.param[0] != frameOrder)
+                SkillEventType type;
+                string name = "";
+                switch (eventData.type)
                 {
-                    if (eventData.paramCount >= 5)
-                    {
-                        int mask = 1 << frameOrder;
-                        if ((eventData.param[4] & mask) == 0)
+                    case 3:
+                        if (eventData.param[0] != frameOrder)
+                        {
+                            if (eventData.paramCount >= 5)
+                            {
+                                int mask = 1 << frameOrder;
+                                if ((eventData.param[4] & mask) == 0)
+                                    continue;
+                            }
+                            else
+                                continue;
+
+                            if (!mShowDebuffSkill)
+                                continue;
+
+                            type = SkillEventType.Skill_Debuf;
+                        }
+                        else
+                        {
+                            if (!mShowSkill)
+                                continue;
+
+                            type = SkillEventType.Skill_Buff;
+                        }
+                        name = SQLite.getSkillName(eventData.param[1]);
+                        if (type == SkillEventType.Skill_Debuf)
+                        {
+                            name += "by " + mHorseName[eventData.param[0]];
+                        }
+                        break;
+                    case 4:
+                        if (eventData.param[0] != frameOrder)
                             continue;
-                    }
-                    else
-                        continue;
-
-                    if (!mShowDebuffSkill)
-                        continue;
-
-                    isDebuff = true;
-                } else
-                {
-                    if (!mShowSkill)
+                        name = "位置取り争い";
+                        type = SkillEventType.Event;
+                        break;
+                    case 5:
+                        if (eventData.param[0] != frameOrder)
+                            continue;
+                        name = "追い比べ";
+                        type = SkillEventType.Event;
+                        break;
+                    default:
                         continue;
                 }
 
@@ -245,19 +277,22 @@ namespace UmaRaceHelper
                 pt2.Y = this.Height;
 
                 Brush br;
-                if (isDebuff)
-                    br = Brushes.Red.Clone();
-                else
-                    br = Brushes.Brown.Clone();
+                switch (type)
+                {
+                    case SkillEventType.Skill_Buff:
+                        br = Brushes.Brown.Clone();
+                        break;
+                    case SkillEventType.Skill_Debuf:
+                        br = Brushes.Red.Clone();
+                        break;
+                    default:
+                        br = Brushes.Green.Clone();
+                        break;
+                }
                 Pen pen = new Pen(br, 1);
                 pen.DashStyle = DashStyles.Dash;
                 drawingContext.DrawLine(pen, pt1, pt2);
-                string str = SQLite.getSkillName(eventData.param[1]);
-                if (isDebuff)
-                {
-                    str += "by " + mHorseName[eventData.param[0]];
-                }
-                FormattedText txt = new FormattedText(str,
+                FormattedText txt = new FormattedText(name,
                         CultureInfo.CurrentCulture,
                         FlowDirection.LeftToRight,
                         new Typeface("MS UI Gothic"),
@@ -352,11 +387,7 @@ namespace UmaRaceHelper
             double lastSpurtTime = 0;
             int preDeltaSp = 0;
             int preDeltaHp = 0;
-            int ptSp = 0;
-            int ptHp = 0;
-            int ptDeltaSp = 0;
-            int ptDeltaHp = 0;
-            double ptDistance = -1;
+            int ptFrame = 0;
             double ptTime = 0;
             double blockedStartTime = 0;
             int blockedHorseIndex = -1;
@@ -436,21 +467,13 @@ namespace UmaRaceHelper
                     {
                         if (Math.Abs(preTime - ptTime) < Math.Abs(ptTime - nowTime))
                         {
-                            ptSp = preSp;
-                            ptHp = preHp;
+                            ptFrame = i - 1;
                             ptTime = preTime;
-                            ptDistance = preDist;
-                            ptDeltaSp = preDeltaSp;
-                            ptDeltaHp = preDeltaHp;
                         }
                         else
                         {
-                            ptSp = nowSp;
-                            ptHp = nowHp;
+                            ptFrame = i;
                             ptTime = nowTime;
-                            ptDistance = nowDist;
-                            ptDeltaSp = deltaSp;
-                            ptDeltaHp = deltaHp;
                         }
                     }
                 }
@@ -470,10 +493,20 @@ namespace UmaRaceHelper
                     mRaceScenario.getEventCount(), mHorseData.mFrameOrder - 1, maxTime);
             }
 
-            if (ptDistance != -1)
+            if (ptFrame > 0)
             {
+                FrameData frameData = mRaceScenario.getFrameData(ptFrame);
+                HorseFrameData horseFrame = frameData.getHorse(mHorseData.mFrameOrder - 1);
+                double time = frameData.getTime();
+                int sp = horseFrame.speed;
+                int hp = horseFrame.hp;
+                double dist = horseFrame.distance;
+                horseFrame = mRaceScenario.getFrameData(ptFrame - 1).getHorse(mHorseData.mFrameOrder - 1);
+                int deltaSp = sp - horseFrame.speed;
+                int deltaHp = hp - horseFrame.hp;
+
                 drawPointer(drawingContext, ref graphRect, ref deltaGraphRect,
-                    ptTime, maxTime, ptSp, ptHp, ptDeltaSp, ptDeltaHp, ptDistance);
+                    time, maxTime, sp, hp, deltaSp, deltaHp, dist);
             }
         }
 

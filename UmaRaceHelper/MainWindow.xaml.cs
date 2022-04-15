@@ -228,6 +228,7 @@ namespace UmaRaceHelper
                 case PacketData.RaceType.Room:
                 case PacketData.RaceType.Daily:
                 case PacketData.RaceType.Legend:
+                case PacketData.RaceType.Training:
                     setIkuseiRaceData2cbbItem();
                     break;
                 case PacketData.RaceType.Group:

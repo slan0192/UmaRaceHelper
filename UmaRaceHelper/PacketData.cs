@@ -15,6 +15,7 @@ namespace UmaRaceHelper
             Group,
             Daily,
             Legend,
+            Training,
             Room,
         };
 
@@ -60,6 +61,11 @@ namespace UmaRaceHelper
                 {
                     parseDailyRace(dataObj);
                     mType = RaceType.Daily;
+                }
+                else if (dataObj.ContainsKey("race_result_info"))
+                {
+                    parseTrainingRace(dataObj);
+                    mType = RaceType.Training;
                 }
                 else
                 {
@@ -180,6 +186,14 @@ namespace UmaRaceHelper
         private void parseDailyRaceScenario(Dictionary<object, object> data)
         {
             Byte[] raceScenarioBytes = unzip(Convert.FromBase64String((string)data["race_scenario"]));
+            mRaceScenario = new RaceScenarioData(raceScenarioBytes);
+        }
+
+        private void parseTrainingRace(Dictionary<object, object> data)
+        {
+            Dictionary<object, object> raceInfo = (Dictionary<object, object>)data["race_result_info"];
+            mRace = new RaceData(raceInfo, (object[])raceInfo["race_horse_data_array"]);
+            Byte[] raceScenarioBytes = unzip(Convert.FromBase64String((string)raceInfo["race_scenario"]));
             mRaceScenario = new RaceScenarioData(raceScenarioBytes);
         }
 

@@ -76,6 +76,11 @@ namespace UmaRaceHelper
 
             return mHorse[index];
         }
+
+        public int getNumHorse()
+        {
+            return mNumHorse;
+        }
     }
 
     public class EventData
